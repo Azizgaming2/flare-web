@@ -1,8 +1,10 @@
+# train/train.py
 import argparse
 import math
 from pathlib import Path
 
 import torch
+import torch.nn as nn
 
 from model.config import ModelConfig, TrainConfig
 from model.cot_head import compute_think_weighted_loss
@@ -24,13 +26,19 @@ def get_lr(step: int, config: TrainConfig) -> float:
 
 def train(shard_dir: str, checkpoint_dir: str, resume_from: str | None) -> None:
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    n_gpus = torch.cuda.device_count()
 
     model_config = ModelConfig()
     train_config = TrainConfig()
 
     model = FlareSLM(model_config, gradient_checkpointing=train_config.gradient_checkpointing).to(device)
 
-    print(f"Model parameters: {model.num_parameters():,}")
+    raw_model = model
+    if n_gpus > 1:
+        model = nn.DataParallel(model)
+        print(f"Using {n_gpus} GPUs via DataParallel")
+
+    print(f"Model parameters: {raw_model.num_parameters():,}")
 
     optimizer = torch.optim.AdamW(
         model.parameters(),
@@ -48,12 +56,14 @@ def train(shard_dir: str, checkpoint_dir: str, resume_from: str | None) -> None:
     start_step = 0
     if resume_from is not None:
         checkpoint = torch.load(resume_from, map_location=device)
-        model.load_state_dict(checkpoint["model"])
+        raw_model.load_state_dict(checkpoint["model"])
         optimizer.load_state_dict(checkpoint["optimizer"])
         start_step = checkpoint["step"]
         print(f"Resumed from step {start_step}")
 
     Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
+
+    effective_batch = train_config.batch_size * max(n_gpus, 1)
 
     model.train()
     for step in range(start_step, train_config.max_steps):
@@ -65,13 +75,13 @@ def train(shard_dir: str, checkpoint_dir: str, resume_from: str | None) -> None:
         accumulated_loss = 0.0
 
         for _ in range(train_config.grad_accum_steps):
-            x, y = train_dataset.get_batch(train_config.batch_size, device)
+            x, y = train_dataset.get_batch(effective_batch, device)
 
             with torch.autocast(device_type=device, dtype=amp_dtype):
                 logits, think_scores, load_balance_loss = model(x)
-                think_mask = model.think_gate.build_think_mask(x)
+                think_mask = raw_model.think_gate.build_think_mask(x)
                 lm_loss = compute_think_weighted_loss(logits, y, think_mask)
-                loss = lm_loss + 0.01 * load_balance_loss
+                loss = lm_loss + 0.01 * load_balance_loss.mean()
                 loss = loss / train_config.grad_accum_steps
 
             scaler.scale(loss).backward()
@@ -86,36 +96,36 @@ def train(shard_dir: str, checkpoint_dir: str, resume_from: str | None) -> None:
             print(f"step {step} | loss {accumulated_loss:.4f} | lr {lr:.6f}")
 
         if step % train_config.eval_interval == 0 and step > 0:
-            evaluate(model, val_dataset, train_config, device, amp_dtype)
+            evaluate(model, raw_model, val_dataset, train_config, device, amp_dtype, effective_batch)
 
         if step % train_config.checkpoint_interval == 0 and step > 0:
-            save_checkpoint(model, optimizer, step, checkpoint_dir)
+            save_checkpoint(raw_model, optimizer, step, checkpoint_dir)
 
-    save_checkpoint(model, optimizer, train_config.max_steps, checkpoint_dir)
+    save_checkpoint(raw_model, optimizer, train_config.max_steps, checkpoint_dir)
 
 
 @torch.no_grad()
-def evaluate(model, val_dataset, train_config, device, amp_dtype, eval_iters: int = 20) -> None:
+def evaluate(model, raw_model, val_dataset, train_config, device, amp_dtype, batch_size, eval_iters: int = 20) -> None:
     model.eval()
     losses = []
 
     for _ in range(eval_iters):
-        x, y = val_dataset.get_batch(train_config.batch_size, device)
+        x, y = val_dataset.get_batch(batch_size, device)
         with torch.autocast(device_type=device, dtype=amp_dtype):
             logits, _, load_balance_loss = model(x)
-            think_mask = model.think_gate.build_think_mask(x)
-            loss = compute_think_weighted_loss(logits, y, think_mask) + 0.01 * load_balance_loss
+            think_mask = raw_model.think_gate.build_think_mask(x)
+            loss = compute_think_weighted_loss(logits, y, think_mask) + 0.01 * load_balance_loss.mean()
         losses.append(loss.item())
 
     print(f"eval loss: {sum(losses) / len(losses):.4f}")
     model.train()
 
 
-def save_checkpoint(model, optimizer, step: int, checkpoint_dir: str) -> None:
+def save_checkpoint(raw_model, optimizer, step: int, checkpoint_dir: str) -> None:
     path = Path(checkpoint_dir) / f"checkpoint_{step:06d}.pth"
     torch.save(
         {
-            "model": model.state_dict(),
+            "model": raw_model.state_dict(),
             "optimizer": optimizer.state_dict(),
             "step": step,
         },

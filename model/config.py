@@ -4,15 +4,15 @@ from dataclasses import dataclass
 @dataclass
 class ModelConfig:
     vocab_size: int = 32000
-    dim: int = 1024
-    n_layers: int = 18
-    n_heads: int = 16
-    n_kv_heads: int = 4
+    dim: int = 896
+    n_layers: int = 14
+    n_heads: int = 14
+    n_kv_heads: int = 2
     max_seq_len: int = 2048
 
-    n_experts: int = 8
+    n_experts: int = 6
     n_experts_per_token: int = 2
-    expert_hidden_dim: int = 2048
+    expert_hidden_dim: int = 1792
 
     think_max_tokens: int = 256
     think_token_id: int = 4
@@ -37,15 +37,15 @@ class ModelConfig:
 
 @dataclass
 class TrainConfig:
-    batch_size: int = 4
-    grad_accum_steps: int = 16
-    learning_rate: float = 3e-4
-    min_learning_rate: float = 3e-5
+    batch_size: int = 2
+    grad_accum_steps: int = 32
+    learning_rate: float = 1e-4
+    min_learning_rate: float = 1e-5
     warmup_steps: int = 1000
-    max_steps: int = 100000
+    max_steps: int = 12000
     weight_decay: float = 0.1
-    grad_clip: float = 1.0
-    checkpoint_interval: int = 1000
-    eval_interval: int = 500
+    grad_clip: float = 0.5
+    checkpoint_interval: int = 250
+    eval_interval: int = 250
     mixed_precision: str = "bf16"
     gradient_checkpointing: bool = True

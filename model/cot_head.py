@@ -27,20 +27,12 @@ class ThinkGate(nn.Module):
         """
         Builds a boolean mask marking positions that fall inside a
         <think> ... </think> span, for loss-weighting during training.
+        Vectorized: no Python-level loop over batch/seq_len.
         """
-        batch, seq_len = input_ids.shape
-        mask = torch.zeros_like(input_ids, dtype=torch.bool)
-
-        for b in range(batch):
-            in_think = False
-            for t in range(seq_len):
-                token = input_ids[b, t].item()
-                if token == self.think_token_id:
-                    in_think = True
-                elif token == self.think_end_token_id:
-                    in_think = False
-                mask[b, t] = in_think
-
+        is_start = input_ids == self.think_token_id
+        is_end = input_ids == self.think_end_token_id
+        state = is_start.int() - is_end.int()
+        mask = torch.cumsum(state, dim=1) > 0
         return mask
 
 
