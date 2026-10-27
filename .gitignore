@@ -1,3 +1,41 @@
-*.txt
-web/
-backend/
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets
+.env
+backend/.env
+backend/firebase-credentials*.json
+
+# Local data
+backend/data/
+
+# Node
+node_modules/
+web/dist/
+web/.env.local
+
+.DS_Store
+node_modules/
+venv/
+.venv/
+dist/
+web/android/
+*.zip
+*.gguf
+node_modules/
+venv/
+.venv/
+dist/
+web/android/
+*.zip
+*.gguf
+node_modules/
+venv/
+.venv/
+dist/
+web/android/
+*.zip
+*.gguf
