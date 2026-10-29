@@ -80,7 +80,7 @@ def _find_tesseract() -> str | None:
 def _image(data: bytes) -> str:
     try:
         import pytesseract
-        from PIL import Image
+        from PIL import Image, ImageOps
     except ImportError as exc:
         raise FileError("ocr_unavailable", 501) from exc
 
@@ -97,11 +97,32 @@ def _image(data: bytes) -> str:
     try:
         image = Image.open(io.BytesIO(data))
         image.load()
-        if max(image.size) > 3000:
+        image = ImageOps.autocontrast(ImageOps.exif_transpose(image).convert("L"))
+        longest = max(image.size)
+        if longest > 3000:
             image.thumbnail((3000, 3000))
-        return pytesseract.image_to_string(image, lang=lang)
+        elif longest < 1200:
+            scale = 1200 / longest
+            image = image.resize((int(image.width * scale), int(image.height * scale)))
+        info = pytesseract.image_to_data(image, lang=lang, output_type=pytesseract.Output.DICT)
     except Exception as exc:
         raise FileError("failed", 422) from exc
+
+    lines: dict[tuple, list[str]] = {}
+    for i, word in enumerate(info["text"]):
+        word = word.strip()
+        try:
+            conf = float(info["conf"][i])
+        except ValueError:
+            continue
+        if not word or conf < 50:
+            continue
+        key = (info["block_num"][i], info["par_num"][i], info["line_num"][i])
+        lines.setdefault(key, []).append(word)
+    text = "\n".join(" ".join(words) for words in lines.values())
+    if len(re.findall(r"\w", text)) < 8:
+        return ""
+    return text
 
 
 def extract_text(name: str, data: bytes) -> tuple[str, bool]:

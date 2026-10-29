@@ -98,6 +98,8 @@ def expand_attachments(message: dict) -> str:
     for item in message.get("attachments") or []:
         name = re.sub(r'[<>"\n]', "", str(item.get("name", "file")))
         text = str(item.get("text", ""))[:MAX_FILE_CHARS].replace("</file>", "")
+        if name.lower().endswith((".png", ".jpg", ".jpeg", ".webp", ".bmp")):
+            text = "[OCR text read from an image. You cannot see the image itself.]\n" + text
         blocks.append(f"<file name={name}>\n{text}\n</file>")
     return "\n\n".join([*blocks, content]) if blocks else content
 
