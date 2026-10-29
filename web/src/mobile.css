@@ -1,0 +1,241 @@
+:root {
+  --sat: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  --sab: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+}
+
+.mobile-menu-btn,
+.drawer-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    height: 100dvh;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .app-layout {
+    height: 100dvh;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: calc(var(--sat) + 8px);
+    left: 10px;
+    z-index: 100;
+    width: 44px;
+    height: 44px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+  }
+
+  .drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .drawer-open .drawer-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 200;
+    width: min(310px, 86vw);
+    padding-top: calc(var(--sat) + 14px);
+    padding-bottom: calc(var(--sab) + 14px);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    overflow-y: auto;
+  }
+
+  .drawer-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .sb-new,
+  .sb-icon,
+  .sb-user,
+  .chat-history-item,
+  .settings-tab,
+  .home-chip {
+    min-height: 44px;
+  }
+
+  .chat-main {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  .chat-window {
+    padding: calc(var(--sat) + 64px) 14px 12px;
+    gap: 18px;
+  }
+
+  .message-row {
+    max-width: 100%;
+  }
+
+  .message-bubble {
+    max-width: 88%;
+  }
+
+  .markdown pre,
+  .markdown .code-block,
+  .markdown .table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .input-area,
+  .chat-main.is-home .input-area {
+    padding: 6px 10px calc(var(--sab) + 10px);
+  }
+
+  .composer {
+    border-radius: 24px;
+  }
+
+  .composer .message-input {
+    font-size: 16px;
+    max-height: 120px;
+  }
+
+  .composer .send-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .composer-foot {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    padding: 0 4px;
+  }
+
+  .composer-note {
+    flex: 1 1 100%;
+    font-size: 11px;
+  }
+
+  .foot-controls {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+
+  .foot-controls .mode-btn {
+    min-height: 36px;
+  }
+
+  .chat-main.is-home .home-hero {
+    margin: 0 16px 20px;
+    gap: 10px;
+  }
+
+  .home-greet {
+    font-size: 28px;
+  }
+
+  .home-spark {
+    width: 28px;
+    height: 28px;
+  }
+
+  .chat-main.is-home .home-chips {
+    padding: 0 12px;
+  }
+
+  .modal-overlay:has(.settings-modal) {
+    left: 0;
+    z-index: 300;
+  }
+
+  .settings-modal {
+    flex-direction: column;
+  }
+
+  .settings-sidebar {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    padding: calc(var(--sat) + 8px) 8px 8px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+
+  .settings-title {
+    padding: 6px 10px;
+    white-space: nowrap;
+  }
+
+  .settings-tab {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+  }
+
+  .settings-panel {
+    padding: 18px 16px calc(var(--sab) + 18px);
+  }
+
+  .settings-panel .modal-close {
+    top: 8px;
+    right: 8px;
+  }
+
+  .settings-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .settings-label-desc {
+    max-width: 100%;
+  }
+
+  .modal-box,
+  .admin-box {
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+
+  .notif-panel {
+    position: fixed;
+    top: calc(var(--sat) + 60px);
+    left: 8px;
+    right: 8px;
+    width: auto;
+  }
+
+  .age-overlay {
+    padding: 16px;
+  }
+}
