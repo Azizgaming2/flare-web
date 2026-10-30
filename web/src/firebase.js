@@ -1,5 +1,13 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDT5kfy5P4LsDhQFIW7ZCBolq7edCVhAow",
@@ -19,6 +27,18 @@ const googleProvider = new GoogleAuthProvider();
 
 export function loginWithGoogle() {
   return signInWithPopup(auth, googleProvider);
+}
+
+export function loginWithEmail(email, password) {
+  return signInWithEmailAndPassword(auth, email, password);
+}
+
+export function registerWithEmail(email, password) {
+  return createUserWithEmailAndPassword(auth, email, password);
+}
+
+export function resetPassword(email) {
+  return sendPasswordResetEmail(auth, email);
 }
 
 export function logout() {

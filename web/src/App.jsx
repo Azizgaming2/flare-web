@@ -7,6 +7,8 @@ import MessageInput from "./components/MessageInput";
 import SettingsModal from "./components/SettingsModal";
 import UpdatesPage from "./components/UpdatesPage";
 import AgeGate from "./components/AgeGate";
+import AuthModal from "./components/AuthModal";
+import { Capacitor } from "@capacitor/core";
 import "./updates.css";
 import "./redesign2.css";
 import "./redesign3.css";
@@ -52,6 +54,7 @@ function errorMessage(err, t) {
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [lang, setLang] = useState("en");
+  const [showLogin, setShowLogin] = useState(false);
   const [mode, setMode] = useState("fast");
   const [showSettings, setShowSettings] = useState(false);
   const [page, setPage] = useState(null);
@@ -413,6 +416,10 @@ export default function App() {
   }
 
   async function handleLogIn() {
+    if (Capacitor.isNativePlatform()) {
+      setShowLogin(true);
+      return;
+    }
     try {
       await loginWithGoogle();
     } catch (err) {
@@ -439,6 +446,9 @@ export default function App() {
         </svg>
       </button>
       <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />
+      {showLogin && (
+        <AuthModal lang={lang} onClose={() => setShowLogin(false)} onDone={() => setShowLogin(false)} />
+      )}
       <Sidebar
         chats={chats}
         activeChatId={activeChatId}
