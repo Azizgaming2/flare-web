@@ -25,6 +25,8 @@ jobs:
         env:
           VITE_API_BASE_URL: ${{ secrets.API_BASE_URL }}
       - run: npx cap add android
+      - run: |
+          sed -i 's#<application#<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n    <application#' android/app/src/main/AndroidManifest.xml
       - run: npx cap sync android
       - run: ./gradlew assembleDebug
         working-directory: web/android

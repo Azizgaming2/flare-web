@@ -4,8 +4,8 @@
 }
 
 html.native {
-  --min-sat: 24px;
-  --min-sab: 16px;
+  --min-sat: 28px;
+  --min-sab: 48px;
 }
 
 .mobile-menu-btn,
@@ -252,5 +252,41 @@ html.native {
 
   .home {
     padding: calc(var(--sat) + 4rem) 1rem calc(var(--sab) + 1rem);
+  }
+}
+@media (max-width: 768px) {
+  .modal-overlay:has(.settings-modal) {
+    padding: 0 !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
+
+  .settings-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+  }
+
+  .settings-sidebar {
+    scrollbar-width: none;
+    padding-top: calc(var(--sat) + 0.5rem);
+  }
+
+  .settings-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .settings-tab,
+  .settings-title {
+    flex-shrink: 0;
+  }
+
+  .settings-panel {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-top: 3rem;
   }
 }
