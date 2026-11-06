@@ -37,6 +37,8 @@ from backend import feedback_service as feedback
 from backend import file_service as fileio
 from backend import search_service as search
 from backend import usage_service as usage
+from backend import admin_api
+from backend import admin_service
 
 logger = logging.getLogger("flare.api")
 
@@ -98,7 +100,8 @@ def client_ip(http: Request) -> str:
 def is_admin(decoded: dict | None) -> bool:
     if not decoded or not decoded.get("email_verified"):
         return False
-    return str(decoded.get("email", "")).lower() in ADMIN_EMAILS
+    email = str(decoded.get("email", "")).lower()
+    return email in ADMIN_EMAILS or admin_service.is_author(email)
 
 
 def verified_email(decoded: dict | None) -> str:
@@ -150,10 +153,9 @@ async def decode_admin(authorization: str | None) -> dict | None:
     except Exception:
         return None
     email = str(decoded.get("email", "")).lower()
-    if decoded.get("email_verified") and email in ADMIN_EMAILS:
+    if decoded.get("email_verified") and (email in ADMIN_EMAILS or admin_service.is_author(email)):
         return decoded
     return None
-
 
 async def require_admin(authorization: str | None) -> None:
     if await decode_admin(authorization) is None:
@@ -165,6 +167,12 @@ def require_model() -> ModelService:
         raise HTTPException(status_code=503, detail="Model service is not ready")
     return model_service
 
+async def require_owner(authorization: str | None) -> str:
+    decoded = await decode_admin(authorization)
+    email = str(decoded.get("email", "")).lower() if decoded else ""
+    if email not in ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="Owner only")
+    return email
 
 def sse(payload: dict) -> str:
     return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
@@ -428,7 +436,9 @@ async def get_storage(authorization: str | None = Header(default=None)):
 
 @app.get("/api/me/admin")
 async def me_admin(authorization: str | None = Header(default=None)):
-    return {"admin": await decode_admin(authorization) is not None}
+    decoded = await decode_admin(authorization)
+    email = str(decoded.get("email", "")).lower() if decoded else ""
+    return {"admin": decoded is not None, "owner": email in ADMIN_EMAILS}
 
 
 @app.put("/api/files/extract")
@@ -633,7 +643,7 @@ async def health():
     ok = await model_service.health()
     return {"status": "ok" if ok else "degraded", "model_loaded": ok, "model": model_service.model}
 
-
+app.include_router(admin_api.build_router(require_admin, require_owner))
 DIST_DIR = pathlib.Path(__file__).resolve().parent.parent / "web" / "dist"
 
 if (DIST_DIR / "assets").is_dir():

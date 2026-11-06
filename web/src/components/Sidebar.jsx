@@ -44,6 +44,8 @@ export default function Sidebar({
   onLogIn,
   onLogOut,
   onOpenUpdates,
+  isAdmin,
+  onOpenAdmin,
   lang,
   setLang,
   languages,
@@ -163,6 +165,17 @@ export default function Sidebar({
                   {t.language}
                   <span className="sb-drop-value">{LANG_NAMES[lang] || lang}</span>
                 </button>
+                  {isAdmin && (
+                  <button
+                    className="sb-drop-item"
+                    onClick={() => {
+                      setUserMenu(false);
+                      onOpenAdmin();
+                    }}
+                  >
+                    Admin Dashboard
+                  </button>
+                )}
                 {langOpen &&
                   languages.map((code) => (
                     <button

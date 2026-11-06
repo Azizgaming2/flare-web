@@ -288,3 +288,4 @@ export async function downloadFeedbackExport() {
   link.click();
   URL.revokeObjectURL(link.href);
 }
+export const apiRequest = request;

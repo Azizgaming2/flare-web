@@ -6,6 +6,8 @@ import Home from "./components/Home";
 import MessageInput from "./components/MessageInput";
 import SettingsModal from "./components/SettingsModal";
 import UpdatesPage from "./components/UpdatesPage";
+import AdminDashboard from "./components/AdminDashboard";
+import { fetchIsAdmin } from "./api/chatApi";
 import AgeGate from "./components/AgeGate";
 import AuthModal from "./components/AuthModal";
 import { Capacitor } from "@capacitor/core";
@@ -58,6 +60,7 @@ export default function App() {
   const [mode, setMode] = useState("fast");
   const [showSettings, setShowSettings] = useState(false);
   const [page, setPage] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
@@ -75,6 +78,15 @@ export default function App() {
 
   const { user, setUser } = useAuth();
   const uid = user?.uid;
+  useEffect(() => {
+    if (!uid) {
+      setIsAdmin(false);
+      return;
+    }
+    fetchIsAdmin()
+      .then(setIsAdmin)
+      .catch(() => setIsAdmin(false));
+  }, [uid]);
 
   const t = translations[lang];
 
@@ -463,6 +475,8 @@ export default function App() {
           handleNewChat();
         }}
         onOpenUpdates={() => { setPage("updates"); setDrawerOpen(false); }}
+        isAdmin={isAdmin}
+        onOpenAdmin={() => { setPage("admin"); setDrawerOpen(false); }}
         onArchiveChat={handleArchiveChat}
         onDeleteChat={handleDeleteChat}
         t={t}
@@ -476,7 +490,9 @@ export default function App() {
       />
 
       <div className={`chat-main ${activeChatId === null && page === null ? "is-home" : ""}`}>
-        {page === "updates" ? (
+        {page === "admin" ? (
+          <AdminDashboard onClose={() => setPage(null)} />
+        ) : page === "updates" ? (
           <UpdatesPage uid={uid} t={t} />
         ) : activeChatId === null ? (
           <Home greeting={greeting} t={t} onPick={handleSend} />

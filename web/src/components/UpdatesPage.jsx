@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import Markdown from "./Markdown";
-import AdminPanel from "./AdminPanel";
 import { fetchUpdates, fetchIsAdmin, updateMediaUrl } from "../api/chatApi";
 import { writeSeen } from "../updatesSeen";
 
@@ -41,11 +40,7 @@ export default function UpdatesPage({ uid, t }) {
       <div className="updates-inner">
         <div className="updates-head">
           <h1>{t.updatesTitle || "Updates"}</h1>
-          {isAdmin && (
-            <button className="notif-manage" onClick={() => setShowAdmin(true)}>
-              Idarə et
-            </button>
-          )}
+          
         </div>
         {updates.length === 0 && <div className="notif-empty">{t.noUpdates || "No updates yet"}</div>}
         {updates.map((u) => (
@@ -63,7 +58,6 @@ export default function UpdatesPage({ uid, t }) {
           </article>
         ))}
       </div>
-      {showAdmin && <AdminPanel onClose={() => setShowAdmin(false)} onChanged={load} />}
     </div>
   );
 }
