@@ -17,6 +17,7 @@ from backend.config import (
     ADMIN_EMAILS,
     ANON_IP_DAILY_LIMIT,
     ANON_MESSAGE_LIMIT,
+    CLASS_TEACHER_EMAILS,
     CORS_ORIGINS,
     MAX_MEMORY_ITEMS,
     MAX_UPDATE_MEDIA_BYTES,
@@ -39,6 +40,7 @@ from backend import search_service as search
 from backend import usage_service as usage
 from backend import admin_api
 from backend import admin_service
+from backend import class_api
 
 logger = logging.getLogger("flare.api")
 
@@ -644,6 +646,15 @@ async def health():
     return {"status": "ok" if ok else "degraded", "model_loaded": ok, "model": model_service.model}
 
 app.include_router(admin_api.build_router(require_admin, require_owner))
+
+
+def can_create_class(decoded: dict) -> bool:
+    if not CLASS_TEACHER_EMAILS:
+        return True
+    return verified_email(decoded) in CLASS_TEACHER_EMAILS or is_admin(decoded)
+
+
+app.include_router(class_api.build_router(resolve_user, can_create_class))
 DIST_DIR = pathlib.Path(__file__).resolve().parent.parent / "web" / "dist"
 
 if (DIST_DIR / "assets").is_dir():

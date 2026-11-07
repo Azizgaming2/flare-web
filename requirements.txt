@@ -1,5 +1,12 @@
-torch>=2.2.0
-tokenizers>=0.15.0
-datasets>=2.16.0
+#First Install These Packages First Run pip install -r requirements.txt
+
 numpy>=1.26.0
 tqdm>=4.66.0
+fastapi>=0.100.0
+uvicorn[standard]>=0.22.0
+firebase-admin>=6.2.0
+ollama>=0.1.0
+pytesseract>=0.3.10
+Pillow>=10.0.0
+psutil>=5.9.0
+python-dotenv>=1.0.0

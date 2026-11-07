@@ -1,5 +1,6 @@
 export const translations = {
   az: {
+    classMode: "Sinif Rejimi",
     newChat: "Yeni Söhbət",
     settings: "Ayarlar",
     general: "Ümumi",
@@ -110,6 +111,7 @@ export const translations = {
     ],
   },
   en: {
+    classMode: "Class Mode",
     newChat: "New Chat",
     settings: "Settings",
     general: "General",
@@ -220,6 +222,7 @@ export const translations = {
     ],
   },
   tr: {
+    classMode: "Sınıf Modu",
     newChat: "Yeni Sohbet",
     settings: "Ayarlar",
     general: "Genel",

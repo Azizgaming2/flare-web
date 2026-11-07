@@ -155,3 +155,16 @@ ANON_MESSAGE_LIMIT = int(os.environ.get("FLARE_ANON_MESSAGE_LIMIT", "5"))
 ANON_IP_DAILY_LIMIT = int(os.environ.get("FLARE_ANON_IP_DAILY_LIMIT", "500"))
 USER_MESSAGE_LIMIT = int(os.environ.get("FLARE_USER_MESSAGE_LIMIT", "30"))
 USER_WINDOW_SECONDS = int(os.environ.get("FLARE_USER_WINDOW_HOURS", "4")) * 3600
+CLASS_DIR = STORAGE_ROOT / "classes"
+CLASS_IDLE_SECONDS = int(os.environ.get("FLARE_CLASS_IDLE_SECONDS", "300"))
+CLASS_MAX_ROOMS = int(os.environ.get("FLARE_CLASS_MAX_ROOMS", "30"))
+CLASS_MAX_PEOPLE = int(os.environ.get("FLARE_CLASS_MAX_PEOPLE", "30"))
+CLASS_FILE_MAX_BYTES = int(os.environ.get("FLARE_CLASS_FILE_MAX_BYTES", str(50 * 1024**2)))
+CLASS_TEACHER_EMAILS = [
+    email.strip().lower()
+    for email in os.environ.get("FLARE_TEACHER_EMAILS", "").split(",")
+    if email.strip()
+]
+CLASS_TURN_URL = os.environ.get("FLARE_TURN_URL", "")
+CLASS_TURN_USER = os.environ.get("FLARE_TURN_USER", "")
+CLASS_TURN_PASS = os.environ.get("FLARE_TURN_PASS", "")

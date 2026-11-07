@@ -46,6 +46,7 @@ export default function Sidebar({
   onOpenUpdates,
   isAdmin,
   onOpenAdmin,
+  onOpenClass,
   lang,
   setLang,
   languages,
@@ -108,6 +109,12 @@ export default function Sidebar({
         <span className="sb-plus">+</span>
         {t.newChat}
       </button>
+
+      {user && (
+        <button className="sb-new" onClick={onOpenClass}>
+          {t.classMode}
+        </button>
+      )}
 
       <div className="chat-history">
         {chats.map((chat) => (

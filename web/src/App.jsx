@@ -7,6 +7,7 @@ import MessageInput from "./components/MessageInput";
 import SettingsModal from "./components/SettingsModal";
 import UpdatesPage from "./components/UpdatesPage";
 import AdminDashboard from "./components/AdminDashboard";
+import ClassMode from "./components/class/ClassMode";
 import { fetchIsAdmin } from "./api/chatApi";
 import AgeGate from "./components/AgeGate";
 import AuthModal from "./components/AuthModal";
@@ -477,6 +478,7 @@ export default function App() {
         onOpenUpdates={() => { setPage("updates"); setDrawerOpen(false); }}
         isAdmin={isAdmin}
         onOpenAdmin={() => { setPage("admin"); setDrawerOpen(false); }}
+        onOpenClass={() => { setPage("class"); setDrawerOpen(false); }}
         onArchiveChat={handleArchiveChat}
         onDeleteChat={handleDeleteChat}
         t={t}
@@ -528,6 +530,10 @@ export default function App() {
         />
         )}
       </div>
+
+      {page === "class" && uid && (
+        <ClassMode user={user} lang={lang} onClose={() => setPage(null)} />
+      )}
 
       {showSettings && (
         <SettingsModal
