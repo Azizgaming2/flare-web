@@ -1,6 +1,6 @@
 # Flare AI
 
-Flare AI is a self-hosted AI chat platform built for schools. It runs a locally served language model, authenticates users with Firebase, stores all user data on the host machine, and ships as both a web application and an Android app.
+Flare AI is a self-hosted AI chat platform built for schools.It Serves AI Language Models authenticates users with Firebase, stores all user data on the host machine, and ships as both a web application and an Android app.
 
 Developed by Flare Corporation.
 
