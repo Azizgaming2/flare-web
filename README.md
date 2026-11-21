@@ -182,3 +182,24 @@ User data is stored on disk on the Flare server at `<FLARE_STORAGE_ROOT>/users/<
 ## License
 
 Proprietary. Copyright (c) 2026 Flare Corporation. All rights reserved. See [LICENSE](LICENSE).
+
+## Credits
+
+**Azizli Aziz**: project owner, lead developer and AI engineer of Flare AI, Flare Corporation.
+
+**Claude** by [Anthropic](https://www.anthropic.com): AI development partner who wrote and reviewed a large part of the code, documentation and tooling together with Azizli Aziz.
+
+Flare AI is built on the following open technologies:
+
+- [Qwen 2.5](https://github.com/QwenLM/Qwen2.5) by Alibaba Cloud, the base of Flare Tentium
+- [Ollama](https://ollama.com) for local model serving
+- [FastAPI](https://fastapi.tiangolo.com) and [Uvicorn](https://www.uvicorn.org) for the backend
+- [React](https://react.dev), [Vite](https://vitejs.dev) and [Capacitor](https://capacitorjs.com) for the web and Android apps
+- [Firebase Authentication](https://firebase.google.com) for sign-in
+- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) for image text recognition
+- [Pyodide](https://pyodide.org) for in-browser Python execution
+- [edge-tts](https://github.com/rany2/edge-tts) for speech synthesis
+- [DDGS](https://github.com/deedy5/ddgs) for web search
+- [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) for secure public access
+
+All third-party names and trademarks belong to their respective owners.
