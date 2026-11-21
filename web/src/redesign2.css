@@ -1,0 +1,114 @@
+.msg-actions {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.375rem;
+}
+
+.msg-actions .copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  margin: 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.msg-actions .copy-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.msg-actions .copy-btn.on {
+  color: var(--accent);
+}
+
+.thumb-down {
+  transform: rotate(180deg);
+}
+
+.sb-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sb-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.sb-icon:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.sb-search-pop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3.5rem;
+  padding: 0.625rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+}
+
+.sb-search-input {
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+}
+
+.sb-result {
+  display: block;
+  width: 100%;
+  padding: 0.4375rem 0.5rem;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.sb-result:hover {
+  background: var(--bg-tertiary);
+}
+
+.sb-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sb-stats b {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
