@@ -50,6 +50,9 @@ function errorMessage(err, t) {
   if (err?.status === 403 && detail?.code === "age_required") {
     return { content: t.ageText, error: true };
   }
+  if (err?.status === 403 && detail?.code === "email_unverified") {
+    return { content: t.emailUnverified || t.requestError, error: true };
+  }
   return { content: t.requestError, error: true };
 }
 

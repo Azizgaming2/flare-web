@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  sendEmailVerification,
   signOut,
 } from "firebase/auth";
 
@@ -35,6 +36,10 @@ export function loginWithEmail(email, password) {
 
 export function registerWithEmail(email, password) {
   return createUserWithEmailAndPassword(auth, email, password);
+}
+
+export function sendVerification(user) {
+  return sendEmailVerification(user);
 }
 
 export function resetPassword(email) {

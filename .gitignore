@@ -11,31 +11,17 @@ backend/firebase-credentials*.json
 
 # Local data
 backend/data/
+*.gguf
+*.zip
 
 # Node
 node_modules/
+dist/
 web/dist/
 web/.env.local
+web/android/
+
+# Local tools
 push.bat
+firestore.rules
 .DS_Store
-node_modules/
-venv/
-.venv/
-dist/
-web/android/
-*.zip
-*.gguf
-node_modules/
-venv/
-.venv/
-dist/
-web/android/
-*.zip
-*.gguf
-node_modules/
-venv/
-.venv/
-dist/
-web/android/
-*.zip
-*.gguf

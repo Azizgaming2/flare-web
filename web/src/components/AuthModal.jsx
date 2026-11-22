@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { loginWithEmail, registerWithEmail, resetPassword } from "../firebase";
+import { loginWithEmail, registerWithEmail, resetPassword, sendVerification, logout } from "../firebase";
+import TurnstileWidget, { verifyTurnstile } from "./TurnstileWidget";
 import "../auth.css";
+
+const TS_ON = Boolean(import.meta.env.VITE_TURNSTILE_SITE_KEY);
 
 const TEXT = {
   en: {
@@ -16,6 +19,9 @@ const TEXT = {
       "auth/network-request-failed": "No connection.",
     },
     fallback: "Login failed.",
+    verifySent: "Verification link sent. Confirm your email, then log in.",
+    verifyNeeded: "Email not verified. A new link was sent to your inbox.",
+    captchaFailed: "Human check failed. Try again.",
   },
   az: {
     login: "Daxil ol", register: "Hesab yarat", email: "E-poçt", password: "Parol",
@@ -30,6 +36,9 @@ const TEXT = {
       "auth/network-request-failed": "Bağlantı yoxdur.",
     },
     fallback: "Giriş alınmadı.",
+    verifySent: "Təsdiq linki göndərildi. E-poçtu təsdiqləyib daxil ol.",
+    verifyNeeded: "E-poçt təsdiqlənməyib. Poçtuna yeni link göndərildi.",
+    captchaFailed: "İnsan yoxlaması alınmadı. Yenidən yoxla.",
   },
   ru: {
     login: "Войти", register: "Создать аккаунт", email: "Эл. почта", password: "Пароль",
@@ -44,6 +53,9 @@ const TEXT = {
       "auth/network-request-failed": "Нет соединения.",
     },
     fallback: "Не удалось войти.",
+    verifySent: "Ссылка подтверждения отправлена. Подтвердите почту и войдите.",
+    verifyNeeded: "Почта не подтверждена. Новая ссылка отправлена на почту.",
+    captchaFailed: "Проверка не пройдена. Попробуйте снова.",
   },
 };
 
@@ -54,19 +66,41 @@ export default function AuthModal({ lang, onClose, onDone }) {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [tsToken, setTsToken] = useState("");
+  const [tsKey, setTsKey] = useState(0);
 
   async function submit() {
     if (busy) return;
     setBusy(true);
     setMessage("");
     try {
-      if (mode === "login") await loginWithEmail(email.trim(), password);
-      else await registerWithEmail(email.trim(), password);
+      if (TS_ON && !(await verifyTurnstile(tsToken))) {
+        setMessage(tx.captchaFailed);
+        return;
+      }
+      if (mode === "login") {
+        const cred = await loginWithEmail(email.trim(), password);
+        if (!cred.user.emailVerified) {
+          await sendVerification(cred.user).catch(() => {});
+          await logout();
+          setMessage(tx.verifyNeeded);
+          return;
+        }
+      } else {
+        const cred = await registerWithEmail(email.trim(), password);
+        await sendVerification(cred.user).catch(() => {});
+        await logout();
+        setMode("login");
+        setMessage(tx.verifySent);
+        return;
+      }
       onDone();
     } catch (err) {
       setMessage(tx.errors[err?.code] || tx.fallback);
     } finally {
       setBusy(false);
+      setTsToken("");
+      setTsKey((k) => k + 1);
     }
   }
 
@@ -101,8 +135,9 @@ export default function AuthModal({ lang, onClose, onDone }) {
           onChange={(e) => setPassword(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit()}
         />
+        {TS_ON && <TurnstileWidget key={tsKey} onToken={setTsToken} />}
         {message && <div className="auth-message">{message}</div>}
-        <button className="auth-submit" onClick={submit} disabled={busy || !email || !password}>
+        <button className="auth-submit" onClick={submit} disabled={busy || !email || !password || (TS_ON && !tsToken)}>
           {mode === "login" ? tx.login : tx.register}
         </button>
         {mode === "login" && (

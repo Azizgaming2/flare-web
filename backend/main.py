@@ -24,9 +24,11 @@ from backend.config import (
     USER_QUOTA_BYTES,
     USER_WINDOW_SECONDS,
 )
+from backend.abuse_guard import abuse_guard, user_blocked_seconds
 from backend.firebase_service import init_firebase, verify_token
 from backend.model_service import ModelService
 from backend.schemas import ID_PATTERN, ChatPatch, ChatRequest, FeedbackRequest, SettingsUpdate, TitleRequest, UpdateCreate
+from backend.turnstile_service import router as turnstile_router
 from backend import storage_service as store
 from backend import updates_service as updates
 from backend import age_guard
@@ -66,6 +68,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.middleware("http")(abuse_guard)
 
 
 async def resolve_identity(authorization: str | None) -> str | None:
@@ -112,6 +115,16 @@ def verified_email(decoded: dict | None) -> str:
 
 
 async def enforce_access(decoded: dict | None, http: Request, anon_id: str | None, user_text: str) -> None:
+    if decoded and not decoded.get("email_verified"):
+        raise HTTPException(status_code=403, detail={"code": "email_unverified"})
+    if decoded and not is_admin(decoded):
+        wait = user_blocked_seconds(decoded["uid"])
+        if wait:
+            raise HTTPException(
+                status_code=429,
+                detail={"code": "limit_reached", "retry_after": wait},
+                headers={"Retry-After": str(wait)},
+            )
     if decoded and not is_admin(decoded):
         uid = decoded["uid"]
         account = await asyncio.to_thread(usage.get_account, uid)
@@ -646,10 +659,20 @@ async def health():
 
 app.include_router(admin_api.build_router(require_admin, require_owner))
 app.include_router(tts_api.build_router(require_uid))
+app.include_router(turnstile_router)
 DIST_DIR = pathlib.Path(__file__).resolve().parent.parent / "web" / "dist"
 
 if (DIST_DIR / "assets").is_dir():
     app.mount("/assets", StaticFiles(directory=DIST_DIR / "assets"), name="assets")
+
+    def _static_page(name: str):
+        async def handler():
+            return FileResponse(DIST_DIR / f"{name}.html")
+
+        return handler
+
+    for _name in ("about", "privacy", "terms"):
+        app.add_api_route(f"/{_name}", _static_page(_name), methods=["GET"], include_in_schema=False)
 
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_frontend(full_path: str):
