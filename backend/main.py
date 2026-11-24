@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import hmac
 import pathlib
+import time
 import json
 import logging
 from urllib.parse import unquote
@@ -11,9 +14,14 @@ from typing import Annotated
 from fastapi import FastAPI, Header, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, StreamingResponse
 
 from backend.config import (
+    AD_REWARD_DAILY_CAP,
+    AD_REWARD_MESSAGES,
+    AD_REWARD_MIN_SECONDS,
+    AD_SECRET,
     ADMIN_EMAILS,
     ANON_IP_DAILY_LIMIT,
     ANON_MESSAGE_LIMIT,
@@ -520,6 +528,47 @@ async def me_status(authorization: str | None = Header(default=None)):
     if is_admin(decoded):
         return {"age_confirmed": True, "suspended": False}
     return await asyncio.to_thread(usage.get_account, decoded["uid"])
+
+
+class AdRewardRequest(BaseModel):
+    token: str
+
+
+def _ad_sign(uid: str, ts: int) -> str:
+    return hmac.new(AD_SECRET.encode(), f"{uid}.{ts}".encode(), hashlib.sha256).hexdigest()
+
+
+@app.post("/api/ads/start")
+async def ads_start(authorization: str | None = Header(default=None)):
+    decoded = await resolve_user(authorization)
+    if decoded is None:
+        raise HTTPException(status_code=401, detail="Login required")
+    ts = int(time.time())
+    return {"token": f"{ts}.{_ad_sign(decoded['uid'], ts)}"}
+
+
+@app.post("/api/ads/reward")
+async def ads_reward(body: AdRewardRequest, authorization: str | None = Header(default=None)):
+    decoded = await resolve_user(authorization)
+    if decoded is None:
+        raise HTTPException(status_code=401, detail="Login required")
+    uid = decoded["uid"]
+    try:
+        ts_text, sig = body.token.split(".", 1)
+        ts = int(ts_text)
+    except ValueError:
+        raise HTTPException(status_code=400, detail={"code": "bad_token"})
+    if not hmac.compare_digest(sig, _ad_sign(uid, ts)):
+        raise HTTPException(status_code=400, detail={"code": "bad_token"})
+    elapsed = int(time.time()) - ts
+    if elapsed < AD_REWARD_MIN_SECONDS or elapsed > 900:
+        raise HTTPException(status_code=400, detail={"code": "bad_timing"})
+    result = await asyncio.to_thread(usage.redeem_ad_token, uid, sig, AD_REWARD_MESSAGES, AD_REWARD_DAILY_CAP)
+    if result == "used":
+        raise HTTPException(status_code=409, detail={"code": "ad_used"})
+    if result == "cap":
+        raise HTTPException(status_code=429, detail={"code": "ad_cap"})
+    return {"granted": AD_REWARD_MESSAGES}
 
 
 @app.post("/api/me/age-confirm")

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import NotificationBell from "./NotificationBell";
+import AdSlot from "./AdSlot";
 
 const LANG_NAMES = { az: "Azərbaycanca", en: "English", tr: "Türkçe" };
 const USAGE_KEY = "flare_usage";
@@ -146,6 +147,8 @@ export default function Sidebar({
           </button>
         </div>
       )}
+
+      {!isAdmin && <AdSlot />}
 
       <div className="sb-footer" onClick={(e) => e.stopPropagation()}>
         {user ? (

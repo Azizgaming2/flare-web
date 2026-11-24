@@ -32,7 +32,10 @@ import {
   fetchAccountStatus,
   confirmAge,
   sendFeedback,
+  adStart,
+  adReward,
 } from "./api/chatApi";
+import { requestRewardedAd, showRewardedAd } from "./adsense";
 
 function errorMessage(err, t) {
   const detail = err?.detail;
@@ -42,7 +45,7 @@ function errorMessage(err, t) {
   if (err?.status === 429 && detail?.code === "limit_reached") {
     const minutes = Math.max(1, Math.ceil((detail.retry_after || 60) / 60));
     const time = minutes >= 60 ? `${Math.ceil(minutes / 60)} ${t.hours}` : `${minutes} ${t.minutes}`;
-    return { content: t.limitReached.replace("{time}", time), error: true };
+    return { content: t.limitReached.replace("{time}", time), error: true, limitReached: true };
   }
   if (err?.status === 403 && detail?.code === "suspended") {
     return { content: t.suspendedText, error: true };
@@ -64,6 +67,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [page, setPage] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const adBusyRef = useRef(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
@@ -214,6 +218,26 @@ export default function App() {
     setChats((prev) =>
       prev.map((c) => (c.id === chatId && !c.loaded ? { ...c, messages: loadedMessages, loaded: true } : c))
     );
+  }
+
+  async function handleWatchAd() {
+    if (adBusyRef.current) return;
+    adBusyRef.current = true;
+    try {
+      const { token } = await adStart();
+      const ad = await requestRewardedAd();
+      if (!ad) {
+        alert(t.adUnavailable);
+        return;
+      }
+      if (!(await showRewardedAd(ad))) return;
+      await adReward(token);
+      handleRegenerate();
+    } catch (err) {
+      alert(err?.detail?.code === "ad_cap" ? t.adCap : t.adUnavailable);
+    } finally {
+      adBusyRef.current = false;
+    }
   }
 
   function handleRegenerate() {
@@ -508,6 +532,7 @@ export default function App() {
             emptyText={greeting}
             userAvatarUrl={user?.avatarUrl}
             onRegenerate={handleRegenerate}
+            onWatchAd={handleWatchAd}
             onLogIn={handleLogIn}
             onFeedback={handleFeedback}
             t={t}

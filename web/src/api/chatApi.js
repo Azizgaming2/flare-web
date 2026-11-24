@@ -301,3 +301,24 @@ export async function fetchSpeech(text, model = "tentium", signal) {
   if (!response.ok) throw new Error(`API error: ${response.status}`);
   return response.blob();
 }
+
+async function adPost(path, body) {
+  const headers = await authHeaders();
+  const response = await fetch(`${API_BASE_URL}${path}`, { method: "POST", headers, body: JSON.stringify(body || {}) });
+  if (!response.ok) {
+    let detail = null;
+    try {
+      detail = (await response.json()).detail;
+    } catch {}
+    throw new ApiError(response.status, detail);
+  }
+  return response.json();
+}
+
+export function adStart() {
+  return adPost("/api/ads/start");
+}
+
+export function adReward(token) {
+  return adPost("/api/ads/reward", { token });
+}

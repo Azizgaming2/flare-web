@@ -1,4 +1,5 @@
 import os
+import secrets
 from pathlib import Path
 
 try:
@@ -155,3 +156,8 @@ ANON_MESSAGE_LIMIT = int(os.environ.get("FLARE_ANON_MESSAGE_LIMIT", "5"))
 ANON_IP_DAILY_LIMIT = int(os.environ.get("FLARE_ANON_IP_DAILY_LIMIT", "500"))
 USER_MESSAGE_LIMIT = int(os.environ.get("FLARE_USER_MESSAGE_LIMIT", "30"))
 USER_WINDOW_SECONDS = int(os.environ.get("FLARE_USER_WINDOW_HOURS", "4")) * 3600
+
+AD_REWARD_MESSAGES = int(os.environ.get("FLARE_AD_REWARD_MESSAGES", "10"))
+AD_REWARD_DAILY_CAP = int(os.environ.get("FLARE_AD_REWARD_DAILY_CAP", "5"))
+AD_REWARD_MIN_SECONDS = int(os.environ.get("FLARE_AD_REWARD_MIN_SECONDS", "6"))
+AD_SECRET = os.environ.get("FLARE_AD_SECRET") or secrets.token_hex(32)

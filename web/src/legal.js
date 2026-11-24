@@ -9,7 +9,7 @@ export const LEGAL_LANGS = [
 const privacy = {
   az: {
     title: "Məxfilik Siyasəti",
-    updated: "Son yenilənmə: 18 oktyabr 2026",
+    updated: "Son yenilənmə: 22 noyabr 2026",
     sections: [
       {
         h: "1. Biz kimik",
@@ -51,6 +51,7 @@ const privacy = {
         h: "6. Xidmət təminatçıları",
         p: [
           "Daxil olma üçün Google, şəbəkə ötürülməsi üçün Cloudflare, Axtarış funksiyası üçün axtarış xidməti istifadə olunur. Onlar məlumatları öz siyasətlərinə uyğun emal edir.",
+          "Reklam: Xidmətdə istəyə bağlı mükafatlı reklamlar göstərilə bilər (məsələn, əlavə mesaj qazanmaq üçün). Reklamlar Google AdSense və Google AdMob vasitəsilə göstərilir; Google və tərəfdaşları reklamın göstərilməsi və ölçülməsi üçün kuki və oxşar texnologiyalardan istifadə edə bilər. Reklamı izləmək tamamilə könüllüdür. Reklam sorğuları uşaq istifadəçilərə uyğun rejimdə göndərilir, fərdiləşdirilmiş reklam və remarketinq istifadə olunmur. Google-un reklam məlumatlarından istifadəsi: https://policies.google.com/technologies/partner-sites",
         ],
       },
       {
@@ -89,7 +90,7 @@ const privacy = {
   },
   ru: {
     title: "Политика конфиденциальности",
-    updated: "Последнее обновление: 18 октября 2026 г.",
+    updated: "Последнее обновление: 22 ноября 2026 г.",
     sections: [
       {
         h: "1. Кто мы",
@@ -131,6 +132,7 @@ const privacy = {
         h: "6. Поставщики услуг",
         p: [
           "Для входа используется Google, для передачи трафика — Cloudflare, для функции «Поиск» — поисковый сервис. Они обрабатывают данные в соответствии со своими политиками.",
+          "Реклама: в Сервисе могут показываться добровольные вознаграждаемые рекламные ролики (например, чтобы получить дополнительные сообщения). Реклама показывается через Google AdSense и Google AdMob; Google и его партнёры могут использовать файлы cookie и аналогичные технологии для показа и измерения рекламы. Просмотр рекламы полностью добровольный. Рекламные запросы отправляются в режиме для детей, персонализированная реклама и ремаркетинг не используются. Как Google использует данные в рекламе: https://policies.google.com/technologies/partner-sites",
         ],
       },
       {
@@ -169,7 +171,7 @@ const privacy = {
   },
   en: {
     title: "Privacy Policy",
-    updated: "Last updated: 18 October 2026",
+    updated: "Last updated: 22 November 2026",
     sections: [
       {
         h: "1. Who we are",
@@ -211,6 +213,7 @@ const privacy = {
         h: "6. Service providers",
         p: [
           "Google is used for sign-in, Cloudflare for network transport, and a search service for the Search feature. They process data under their own policies.",
+          "Advertising: the Service may show optional rewarded ads (for example, to earn extra messages). Ads are served through Google AdSense and Google AdMob; Google and its partners may use cookies and similar technologies to serve and measure ads. Watching an ad is entirely voluntary. Ad requests are sent with child-directed treatment, and personalised advertising and remarketing are not used. How Google uses data in advertising: https://policies.google.com/technologies/partner-sites",
         ],
       },
       {

@@ -44,6 +44,7 @@ export default function MessageInput({
   const [notice, setNotice] = useState("");
   const areaRef = useRef(null);
   const fileRef = useRef(null);
+  const camRef = useRef(null);
   const menuRef = useRef(null);
   const baseRef = useRef("");
   const noticeTimer = useRef(null);
@@ -194,6 +195,22 @@ export default function MessageInput({
       style={{ "--i": 0 }}
       onClick={() => {
         setMenuOpen(false);
+        camRef.current?.click();
+      }}
+    >
+      <span className="plus-ico">
+        <Svg>
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+          <circle cx="12" cy="13" r="4" />
+        </Svg>
+      </span>
+      <span className="plus-label">{t.takePhoto}</span>
+    </button>
+    <button
+      className="plus-item"
+      style={{ "--i": 1 }}
+      onClick={() => {
+        setMenuOpen(false);
         fileRef.current?.click();
       }}
     >
@@ -206,7 +223,7 @@ export default function MessageInput({
     </button>
     <button
       className={`plus-item ${webSearch ? "active" : ""}`}
-      style={{ "--i": 1 }}
+      style={{ "--i": 2 }}
       onClick={() => {
         setWebSearch(!webSearch);
         setMenuOpen(false);
@@ -222,7 +239,7 @@ export default function MessageInput({
       {webSearch && <span className="plus-badge">ON</span>}
     </button>
     {speech.supported && (
-      <button className="plus-item" style={{ "--i": 2 }} onClick={cycleVoiceLang}>
+      <button className="plus-item" style={{ "--i": 3 }} onClick={cycleVoiceLang}>
         <span className="plus-ico">
           <Svg>
             <circle cx="12" cy="12" r="9" />
@@ -236,6 +253,7 @@ export default function MessageInput({
   </div>
 )}
             <input ref={fileRef} type="file" accept={ACCEPT} multiple hidden onChange={handlePick} />
+            <input ref={camRef} type="file" accept="image/*" capture="environment" hidden onChange={handlePick} />
           </div>
 
           <textarea

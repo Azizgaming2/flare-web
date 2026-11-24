@@ -36,6 +36,12 @@ def _db() -> sqlite3.Connection:
             "age_confirmed INTEGER NOT NULL DEFAULT 0, age_confirmed_at INTEGER, "
             "suspended INTEGER NOT NULL DEFAULT 0, suspend_reason TEXT, suspended_at INTEGER)"
         )
+        _conn.execute("CREATE TABLE IF NOT EXISTS user_bonus (uid TEXT PRIMARY KEY, remaining INTEGER NOT NULL DEFAULT 0)")
+        _conn.execute(
+            "CREATE TABLE IF NOT EXISTS ad_rewards "
+            "(uid TEXT NOT NULL, day INTEGER NOT NULL, count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (uid, day))"
+        )
+        _conn.execute("CREATE TABLE IF NOT EXISTS ad_tokens (sig TEXT PRIMARY KEY, ts INTEGER NOT NULL)")
         _conn.commit()
     return _conn
 
@@ -59,6 +65,11 @@ def consume_user(uid: str, limit: int, window_seconds: int) -> tuple[bool, int]:
         db.execute("DELETE FROM user_usage WHERE uid = ? AND ts <= ?", (uid, now - window_seconds))
         rows = db.execute("SELECT ts FROM user_usage WHERE uid = ? ORDER BY ts", (uid,)).fetchall()
         if len(rows) >= limit:
+            bonus = db.execute("SELECT remaining FROM user_bonus WHERE uid = ?", (uid,)).fetchone()
+            if bonus and bonus[0] > 0:
+                db.execute("UPDATE user_bonus SET remaining = remaining - 1 WHERE uid = ?", (uid,))
+                db.commit()
+                return True, 0
             retry_after = rows[-limit][0] + window_seconds - now
             db.commit()
             return False, max(retry_after, 1)
@@ -147,3 +158,31 @@ def list_suspended() -> list[dict]:
             "ORDER BY suspended_at DESC"
         ).fetchall()
     return [{"uid": r[0], "email": r[1], "reason": r[2], "suspended_at": r[3]} for r in rows]
+
+
+def redeem_ad_token(uid: str, sig: str, amount: int, daily_cap: int) -> str:
+    now = int(time.time())
+    day = now // 86400
+    with _lock:
+        db = _db()
+        db.execute("DELETE FROM ad_tokens WHERE ts < ?", (now - 3600,))
+        if db.execute("SELECT 1 FROM ad_tokens WHERE sig = ?", (sig,)).fetchone():
+            db.commit()
+            return "used"
+        row = db.execute("SELECT count FROM ad_rewards WHERE uid = ? AND day = ?", (uid, day)).fetchone()
+        if row and row[0] >= daily_cap:
+            db.commit()
+            return "cap"
+        db.execute("INSERT INTO ad_tokens (sig, ts) VALUES (?, ?)", (sig, now))
+        db.execute(
+            "INSERT INTO ad_rewards (uid, day, count) VALUES (?, ?, 1) "
+            "ON CONFLICT(uid, day) DO UPDATE SET count = count + 1",
+            (uid, day),
+        )
+        db.execute(
+            "INSERT INTO user_bonus (uid, remaining) VALUES (?, ?) "
+            "ON CONFLICT(uid) DO UPDATE SET remaining = remaining + ?",
+            (uid, amount, amount),
+        )
+        db.commit()
+        return "ok"

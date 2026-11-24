@@ -599,3 +599,30 @@
   max-width: none;
   margin: 0;
 }
+
+.sb-ad {
+  min-height: 90px;
+  margin: 0.5rem 0;
+  overflow: hidden;
+}
+.sb-ad {
+  max-height: 260px;
+}
+.app-layout {
+  min-height: 100vh;
+  max-height: 100vh;
+}
+
+@media (min-width: 769px) {
+  .sidebar {
+    min-height: 100vh;
+    max-height: 100vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-layout {
+    min-height: 100dvh;
+    max-height: 100dvh;
+  }
+}

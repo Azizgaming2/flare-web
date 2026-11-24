@@ -11,6 +11,7 @@ export default function ChatWindow({
   userAvatarUrl,
   onRegenerate,
   onLogIn,
+  onWatchAd,
   onFeedback,
   t,
 }) {
@@ -53,6 +54,8 @@ export default function ChatWindow({
           showRegenerate={idx === visibleMessages.length - 1 && msg.role === "assistant" && !isLoading && !msg.error}
           onRegenerate={onRegenerate}
           loginRequired={msg.loginRequired}
+          limitReached={msg.limitReached}
+          onWatchAd={onWatchAd}
           attachments={msg.attachments}
           index={idx}
           onFeedback={onFeedback}

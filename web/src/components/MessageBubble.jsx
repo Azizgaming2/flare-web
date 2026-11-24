@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { rewardedEnabled } from "../adsense";
 import Markdown from "./Markdown";
 import { formatDuration, normalizeAssistant } from "../utils";
 import { useTts } from "../hooks/useTts";
@@ -33,6 +34,8 @@ export default function MessageBubble({
   storageFull,
   loginRequired,
   onLogIn,
+  limitReached,
+  onWatchAd,
   t,
 }) {
   const isUser = role === "user";
@@ -99,6 +102,11 @@ export default function MessageBubble({
         <div className="message-bubble assistant">
           <Markdown content={text} labels={labels} />
         </div>
+        {limitReached && rewardedEnabled() && (
+          <button className="login-cta" onClick={onWatchAd}>
+            {t.watchAd}
+          </button>
+        )}
         {loginRequired && (
           <button className="login-cta" onClick={onLogIn}>
             {t.logIn}
