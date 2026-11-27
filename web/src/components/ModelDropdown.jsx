@@ -16,7 +16,7 @@ export default function ModelDropdown({ model, setModel, models, t }) {
   const current = models.find((m) => m.id === model) || models[0];
 
   return (
-    <div className="mode-dropdown-wrapper" ref={ref}>
+    <div className="mode-dropdown-wrapper" ref={ref} data-tour="model">
       <button className="mode-btn" onClick={() => setOpen(!open)}>
         {current.name} ▾
       </button>

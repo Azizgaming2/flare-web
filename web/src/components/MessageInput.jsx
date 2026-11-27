@@ -181,8 +181,8 @@ export default function MessageInput({
           </div>
         )}
 
-        <div className="composer-row">
-          <div className="plus-wrap" ref={menuRef}>
+        <div className="composer-row" data-tour="input">
+          <div className="plus-wrap" ref={menuRef} data-tour="plus">
             <button className="icon-btn" onClick={() => setMenuOpen(!menuOpen)} title={t.attachFile}>
               <Svg>
                 <path d="M12 5v14M5 12h14" />
@@ -269,6 +269,7 @@ export default function MessageInput({
           {speech.supported && (
             <button
               className={`icon-btn ${speech.listening ? "on" : ""}`}
+              data-tour="mic"
               onClick={toggleMic}
               title={speech.listening ? t.micStop : `${t.micStart} (${voiceLang.toUpperCase()})`}
             >

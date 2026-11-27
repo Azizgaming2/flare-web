@@ -105,7 +105,7 @@ export default function Sidebar({
     <div className="sidebar">
       <div className="sb-brand">Flare AI</div>
 
-      <button className="sb-new" onClick={onNewChat}>
+      <button className="sb-new" data-tour="new-chat" onClick={onNewChat}>
         <span className="sb-plus">+</span>
         {t.newChat}
       </button>
@@ -150,7 +150,7 @@ export default function Sidebar({
 
       {!isAdmin && <AdSlot />}
 
-      <div className="sb-footer" onClick={(e) => e.stopPropagation()}>
+      <div className="sb-footer" data-tour="account" onClick={(e) => e.stopPropagation()}>
         {user ? (
           <>
             {userMenu && (

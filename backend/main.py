@@ -720,7 +720,7 @@ if (DIST_DIR / "assets").is_dir():
 
         return handler
 
-    for _name in ("about", "privacy", "terms"):
+    for _name in ("about", "privacy", "terms", "guides", "guide-study", "guide-feynman", "guide-exam", "guide-honest-ai"):
         app.add_api_route(f"/{_name}", _static_page(_name), methods=["GET"], include_in_schema=False)
 
     @app.get("/{full_path:path}", include_in_schema=False)

@@ -20,7 +20,7 @@ export default function ModeDropdown({ mode, setMode, t }) {
   }, []);
 
   return (
-    <div className="mode-dropdown-wrapper" ref={ref}>
+    <div className="mode-dropdown-wrapper" ref={ref} data-tour="mode">
       <button className="mode-btn" onClick={() => setOpen(!open)}>
         {current.label} ▾
       </button>

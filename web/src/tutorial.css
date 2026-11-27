@@ -1,0 +1,100 @@
+.tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  animation: tour-in 0.7s ease both;
+  transition: opacity 0.35s ease;
+}
+.tour-root.leaving {
+  opacity: 0;
+}
+.tour-blocker {
+  position: absolute;
+  inset: 0;
+}
+.tour-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+}
+.tour-hole {
+  position: absolute;
+  border-radius: 14px;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.82), 0 0 0 2px #fa875d, 0 0 24px rgba(250, 135, 93, 0.45);
+  pointer-events: none;
+  transition: top 0.4s ease, left 0.4s ease, width 0.4s ease, height 0.4s ease;
+}
+.tour-tip {
+  position: absolute;
+  width: min(320px, calc(100vw - 24px));
+  padding: 16px 18px;
+  border: 1px solid var(--bg-hover);
+  border-radius: 14px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  animation: tour-tip-in 0.35s ease both;
+}
+.tour-count {
+  margin-bottom: 6px;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+.tour-title {
+  margin-bottom: 6px;
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+.tour-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+.tour-skip {
+  padding: 6px 4px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+.tour-skip:hover {
+  color: var(--text-primary);
+}
+.tour-next {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #fa875d;
+  color: #1a0b04;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tour-next:hover {
+  filter: brightness(1.08);
+}
+@keyframes tour-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes tour-tip-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-root,
+  .tour-hole,
+  .tour-tip {
+    animation: none;
+    transition: none;
+  }
+}

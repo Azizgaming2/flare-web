@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import SplashScreen from "./components/SplashScreen";
+import Welcome from "./components/Welcome";
+import Tutorial from "./components/Tutorial";
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import Home from "./components/Home";
@@ -59,9 +61,34 @@ function errorMessage(err, t) {
   return { content: t.requestError, error: true };
 }
 
+function storageGet(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function storageSet(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+function initialLang() {
+  const saved = storageGet("flare_lang");
+  if (saved && translations[saved]) return saved;
+  const nav = (navigator.language || "en").slice(0, 2).toLowerCase();
+  return translations[nav] ? nav : "en";
+}
+
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState(initialLang);
+  const [showWelcome, setShowWelcome] = useState(() => !storageGet("flare_welcome_done"));
+  const [showTour, setShowTour] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [mode, setMode] = useState("fast");
   const [showSettings, setShowSettings] = useState(false);
@@ -96,6 +123,10 @@ export default function App() {
   }, [uid]);
 
   const t = translations[lang];
+
+  useEffect(() => {
+    storageSet("flare_lang", lang);
+  }, [lang]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 1200);
@@ -477,6 +508,20 @@ export default function App() {
 
   if (showSplash) return <SplashScreen />;
 
+  if (showWelcome) {
+    return (
+      <Welcome
+        lang={lang}
+        setLang={setLang}
+        onDone={() => {
+          storageSet("flare_welcome_done", "1");
+          setShowWelcome(false);
+          if (!storageGet("flare_tour_done")) setShowTour(true);
+        }}
+      />
+    );
+  }
+
   return (
     <div className={`app-layout ${drawerOpen ? "drawer-open" : ""}`}>
       <button className="mobile-menu-btn" onClick={() => setDrawerOpen(true)} aria-label="Menu">
@@ -576,6 +621,16 @@ export default function App() {
 
       {uid && account && (account.suspended || !account.age_confirmed) && (
         <AgeGate account={account} t={t} onConfirm={handleConfirmAge} onLogOut={handleLogOut} />
+      )}
+
+      {showTour && (
+        <Tutorial
+          t={t}
+          onClose={() => {
+            storageSet("flare_tour_done", "1");
+            setShowTour(false);
+          }}
+        />
       )}
     </div>
   );

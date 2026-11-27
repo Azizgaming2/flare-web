@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://flareai.dpdns.org/</loc><lastmod>2026-11-22</lastmod></url>
-  <url><loc>https://flareai.dpdns.org/about</loc><lastmod>2026-11-22</lastmod></url>
-  <url><loc>https://flareai.dpdns.org/privacy</loc><lastmod>2026-11-22</lastmod></url>
-  <url><loc>https://flareai.dpdns.org/terms</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://flareai.dpdns.org/</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://flareai.dpdns.org/about</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://flareai.dpdns.org/guides</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://flareai.dpdns.org/guide-study</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://flareai.dpdns.org/guide-feynman</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://flareai.dpdns.org/guide-exam</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://flareai.dpdns.org/guide-honest-ai</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://flareai.dpdns.org/privacy</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://flareai.dpdns.org/terms</loc><lastmod>2026-11-27</lastmod></url>
 </urlset>
